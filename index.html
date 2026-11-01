@@ -187,10 +187,10 @@ footer b{color:var(--ink);font-weight:600}
 
   <footer>
     <div><b>데이터</b> 국토교통부 아파트 매매·전월세 실거래가(공공데이터포털). 성남시 수정구와 중원구 아파트이고, 분당구와 위례신도시(수정구 창곡동, 이름에 ‘위례’가 들어간 단지)는 뺐습니다.</div>
-    <div><b>계산 기준</b> 평당가는 같은 권역(수정구·중원구) 중위값과 비교합니다. 매매가와 전세가는 위에서 고른 기간(최근 3개월 또는 6개월)의 중위값입니다. 해제된 거래와 1~3층 거래는 현재가에서 빼고, 전세가는 월세 없는 순수 전세만 씁니다. 전고점은 거래가 있었던 달 3개씩 묶은 중위값의 최고치라서 단발성 고가 거래의 영향을 덜 받습니다.</div>
+    <div><b>계산 기준</b> 평당가는 같은 권역(수정구·중원구) 중위값과 비교합니다. 매매가와 전세가는 위에서 고른 기간(최근 3개월 또는 6개월)의 중위값입니다. 해제된 거래와 1~3층 거래는 현재가에서 빼고, 전세가는 월세 없는 순수 전세만 씁니다. 전고점은 데이터 마지막 달 기준 1년 전까지의 역대 최고가입니다. 최근 1년 시세는 ‘현재’로 보고 전고점에서 뺍니다. 단발성 고가 거래의 영향을 줄이려고 거래가 있었던 달 3개씩 묶은 중위값의 최고치를 씁니다. 지금 시세가 전고점보다 높으면 ‘전고점 돌파’로 표시하고, 1년 이상 된 거래가 없는 신축 단지는 이 항목을 중간 점수로 둡니다.</div>
     <div><b>임대 출신 표시</b> 공공임대·민간임대로 공급된 뒤 분양전환된 단지는 ‘임대 출신’, 준공 4년 이상 지나서야 84㎡ 첫 매매가 나온 단지는 ‘임대 추정’으로 표시합니다. 추정은 데이터로 짐작한 것이라 틀릴 수 있습니다.</div>
     <div><b>한계</b> 실거래 신고는 계약 후 30일까지 들어오므로 최근 한두 달은 건수가 적습니다. 점수는 공식 지표가 아니라 화면 위 가중치로 만든 참고값이니, 투자 판단은 현장 확인과 함께 하세요.</div>
-    <div class="verline"><span class="ver">v0.1.1</span><span>coded by SM Jeong</span></div><details class="history" id="history"><summary>업데이트 기록</summary><ol class="hist"><li><div class="hv"><b>v0.1.1</b><span>2026-11-01</span></div><ul><li>카카오 지하철역 정보로 ‘역 1km 이내’ 필터와 단지별 가까운 역·거리 표시 (22개 역)</li></ul></li><li><div class="hv"><b>v0.1</b><span>2026-10-31</span></div><ul><li>동탄 스크리너(v0.2)와 같은 체계로 구성남(성남 수정구·중원구) 첫 버전</li><li>위례신도시(창곡동, 이름에 ‘위례’가 들어간 단지)와 분당구 제외</li><li>권역: 수정구 / 중원구, 평당가는 같은 구 중위값과 비교</li><li>임대 출신 표시, 3·6개월 기간 선택, 가중치 조절, 카카오맵 버전 동일 적용</li></ul></li></ol></details>
+    <div class="verline"><span class="ver">v0.2</span><span>coded by SM Jeong</span></div><details class="history" id="history"><summary>업데이트 기록</summary><ol class="hist"><li><div class="hv"><b>v0.2</b><span>2026-11-01</span></div><ul><li>전고점 기준 변경: 데이터 마지막 달 기준 1년 전까지의 역대 최고가 (최근 1년 시세는 전고점에서 제외)</li><li>지금 시세가 전고점보다 높으면 ‘전고점 돌파’로 표시, 1년 이상 된 거래가 없는 신축은 이 항목을 중간 점수로 처리</li><li>시세 차트에 전고점 시점과 전고점 기준 기간 경계선 표시</li></ul></li><li><div class="hv"><b>v0.1.1</b><span>2026-11-01</span></div><ul><li>카카오 지하철역 정보로 ‘역 1km 이내’ 필터와 단지별 가까운 역·거리 표시 (22개 역)</li></ul></li><li><div class="hv"><b>v0.1</b><span>2026-10-31</span></div><ul><li>동탄 스크리너(v0.2)와 같은 체계로 구성남(성남 수정구·중원구) 첫 버전</li><li>위례신도시(창곡동, 이름에 ‘위례’가 들어간 단지)와 분당구 제외</li><li>권역: 수정구 / 중원구, 평당가는 같은 구 중위값과 비교</li><li>임대 출신 표시, 3·6개월 기간 선택, 가중치 조절, 카카오맵 버전 동일 적용</li></ul></li></ol></details>
   </footer>
 </div>
 
@@ -208,15 +208,16 @@ const median=a=>{const s=[...a].sort((x,y)=>x-y),m=s.length>>1;return s.length%2
 const clamp=v=>Math.max(0,Math.min(1,v));
 const ymLabel=ym=>`${ym.slice(0,4)}.${ym.slice(4)}`;
 
+// 전고점 기준: 데이터 마지막 달에서 1년 전까지의 거래만 봄 (최근 1년 시세는 '현재'로 취급)
+const PEAK_CUTOFF=(()=>{const y=+RAW.through.slice(0,4)-1;return `${y}${RAW.through.slice(4)}`})();
 const DATA=RAW.cx.map((c,i)=>{
   const keys=Object.keys(c.s).sort();
-  // 전고점: 거래가 있는 달 3개씩 묶은 이동 중위값의 최고치 (단발성 고가 거래 영향 완화)
-  let peak=0,peakYm=keys[0]||"";
-  for(let k=0;k<keys.length;k++){
-    const win=keys.slice(Math.max(0,k-1),k+2).map(x=>c.s[x]);
-    const v=median(win);if(v>peak){peak=v;peakYm=keys[k]}
+  // 전고점: 1년 전까지, 거래가 있는 달 3개씩 묶은 이동 중위값의 최고치 (단발성 고가 거래 영향 완화)
+  const old=keys.filter(k=>k<=PEAK_CUTOFF);
+  let peak=null,peakYm="";
+  for(let k=0;k<old.length;k++){
+    const v=median(old.slice(Math.max(0,k-1),k+2).map(x=>c.s[x]));if(peak==null||v>peak){peak=v;peakYm=old[k]}
   }
-  peak=Math.max(peak,c.p);
   return {id:"c"+i,name:c.n,dong:c.d,built:c.b,series:c.s,keys,
     by:{"6":{p:c.p,j:c.j,c:c.c},"3":{p:c.p3,j:c.j3,c:c.c3||0}},
     trades:c.t.map(([date,floor,price])=>({date:date.replace(/-/g,"."),floor,price,low:floor<=3})),
@@ -258,7 +259,7 @@ function applyPeriod(){
     const b=d.by[PERIOD];
     d.has=b.p!=null;d.price=b.p;d.jeonse=b.j;d.cnt=b.c;
     if(!d.has)return;
-    d.recovery=Math.min(1,d.price/Math.max(d.peak,d.price));
+    d.recovery=d.peak?d.price/d.peak:null;   // 1 넘으면 전고점 돌파
     d.ratio=d.jeonse?d.jeonse/d.price:null;d.ppy=d.price/PYEONG;
   });
   // 평당가 비교는 같은 권역(동탄1·동탄2·영통권·기흥·수지) 중위값 기준
@@ -270,7 +271,7 @@ applyPeriod();
 
 // ---------- 점수 ----------
 const FACTORS=[
-  {key:"rec",label:"전고점 대비 하락폭",hint:"전고점보다 많이 빠져 있을수록 점수↑",def:35,f:d=>clamp((1-d.recovery)/0.25),show:d=>`회복 ${(d.recovery*100).toFixed(0)}%`},
+  {key:"rec",label:"전고점 대비 하락폭",hint:"전고점보다 많이 빠져 있을수록 점수↑",def:35,f:d=>d.recovery==null?0.5:clamp((1-d.recovery)/0.25),show:d=>d.recovery==null?"전고점 없음":(d.recovery>1?`전고점 돌파 ${(d.recovery*100).toFixed(0)}%`:`회복 ${(d.recovery*100).toFixed(0)}%`)},
   {key:"dist",label:"권역 평균 대비 평당가",hint:"같은 권역 중위 평당가보다 쌀수록 점수↑",def:25,f:d=>clamp((0.5-d.vsDist)/1.0),show:d=>`${d.vsDist>=0?"+":""}${(d.vsDist*100).toFixed(0)}%`},
   {key:"jr",label:"전세가율",hint:"매매가를 받쳐주는 전세가 높을수록 점수↑",def:20,f:d=>d.ratio==null?0.5:clamp((d.ratio-0.35)/0.3),show:d=>d.ratio==null?"자료 없음":`${(d.ratio*100).toFixed(0)}%`},
   {key:"new",label:"신축도",hint:"같은 값이면 새 아파트일수록 점수↑",def:20,f:d=>clamp((d.built-2005)/18),show:d=>`${d.built}년`},
@@ -371,7 +372,7 @@ function renderStats(){
   $("stats").innerHTML=[
     [REGION==="all"?"전체 중위 평당가":`${GROUPS.find(g=>g.k===REGION).l} 중위 평당가`,`${Math.round(REGION==="all"?DIST_PPY:(GRP_PPY[REGION]||0)).toLocaleString()}<small> 만원/전용3.3㎡</small>`],
     ["중위 전세가율",`${(median(withR.map(d=>d.ratio))*100).toFixed(1)}<small>%</small>`],
-    ["중위 전고점 회복",`${(median(live.map(d=>d.recovery))*100).toFixed(0)}<small>%</small>`],
+    ["중위 전고점 회복",`${(median(live.filter(d=>d.recovery!=null).map(d=>d.recovery))*100).toFixed(0)}<small>%</small>`],
     [`최근 ${PERIOD}개월 84㎡ 거래`,`${vol.toLocaleString()}<small> 건 · ${live.length}개 단지</small>`],
   ].map(([k,v])=>`<div class="stat"><div class="k">${k}</div><div class="v num">${v}</div></div>`).join("");
 }
@@ -416,7 +417,7 @@ function renderList(){
     return `<div class="item"><button class="row" data-id="${d.id}" aria-expanded="${open===d.id}">
       <span class="rank">${String(i+1).padStart(2,"0")}</span>
       <span style="min-width:0"><div class="name">${d.name}</div>
-        <div class="meta"><span class="grp">${d.grp}</span>${d.rent?`<span class="rent" title="${d.rent.why}">${d.rent.k}</span>`:""}<span>${d.dong}</span>${d.stn?`<span>${d.stn.n} ${d.stn.m<1000?Math.round(d.stn.m/10)*10+"m":(d.stn.m/1000).toFixed(1)+"km"}</span>`:""}<span>${d.built}년</span><span class="num">${eokS(d.price)}</span><span class="num">전고점 ${eokS(d.peak)}</span><span class="num">전세가율 ${d.ratio==null?"–":(d.ratio*100).toFixed(0)+"%"}</span><span>${PERIOD}개월 거래 ${d.cnt}건</span></div></span>
+        <div class="meta"><span class="grp">${d.grp}</span>${d.rent?`<span class="rent" title="${d.rent.why}">${d.rent.k}</span>`:""}<span>${d.dong}</span>${d.stn?`<span>${d.stn.n} ${d.stn.m<1000?Math.round(d.stn.m/10)*10+"m":(d.stn.m/1000).toFixed(1)+"km"}</span>`:""}<span>${d.built}년</span><span class="num">${eokS(d.price)}</span><span class="num">${d.peak?`전고점 ${eokS(d.peak)}`:"전고점 없음"}</span><span class="num">전세가율 ${d.ratio==null?"–":(d.ratio*100).toFixed(0)+"%"}</span><span>${PERIOD}개월 거래 ${d.cnt}건</span></div></span>
       <span class="score"><span class="s">${s.toFixed(0)}</span><span class="bar"><i style="width:${s}%"></i></span><span class="pill ${cls}">${g}</span></span>
     </button>${open===d.id?detail(d):""}</div>`}).join("")+
     (all.length>shownN?`<div class="item"><button class="row more" id="more" style="grid-template-columns:1fr;text-align:center;color:var(--accent)">${all.length-shownN}개 더 보기</button></div>`:"");
@@ -425,7 +426,7 @@ function renderList(){
 }
 function detail(d){
   const o=d.by[PERIOD==="6"?"3":"6"],ol=PERIOD==="6"?"3":"6";
-  const kv=[[`매매가 (${PERIOD}개월 중위)`,eok(d.price)],[`전세가 (${PERIOD}개월 중위)`,d.jeonse?eok(d.jeonse):"자료 없음"],["전용3.3㎡당",Math.round(d.ppy).toLocaleString()+"만"],[`전고점 (${ymLabel(d.peakYm)})`,eok(d.peak)]];
+  const kv=[[`매매가 (${PERIOD}개월 중위)`,eok(d.price)],[`전세가 (${PERIOD}개월 중위)`,d.jeonse?eok(d.jeonse):"자료 없음"],["전용3.3㎡당",Math.round(d.ppy).toLocaleString()+"만"],[d.peak?`전고점 (${ymLabel(d.peakYm)})`:"전고점",d.peak?eok(d.peak):`${ymLabel(PEAK_CUTOFF)} 이전 거래 없음`]];
   const tw=FACTORS.reduce((a,f)=>a+W[f.key],0)||1;
   const q=encodeURIComponent(d.name), cityQ=encodeURIComponent(`${d.dong} ${d.name}`);
   const links=`<div class="maplinks">${d.lat?`<a class="mlink" href="https://map.kakao.com/link/map/${q},${d.lat},${d.lng}" target="_blank" rel="noopener">카카오맵에서 보기</a>`:""}<a class="mlink" href="https://map.naver.com/p/search/${cityQ}" target="_blank" rel="noopener">네이버지도에서 보기</a></div>`;
@@ -438,14 +439,14 @@ function detail(d){
     <div><h2 style="font-size:14px;margin-bottom:6px">월별 거래가 중위값 (${ymLabel(MONTHS[0])} – ${ymLabel(RAW.through)})</h2>${chart(d)}<div class="note">점 하나가 거래가 있었던 달의 중위값입니다. 저층(1~3층) 거래는 뺐습니다.</div></div>
     <div><h2 style="font-size:14px;margin-bottom:6px">최근 실거래 (전용 80~86㎡)</h2>
       <div class="tablewrap"><table><thead><tr><th>계약일</th><th>층</th><th>거래가</th><th>전고점 대비</th><th>비고</th></tr></thead><tbody>
-      ${d.trades.map(t=>`<tr class="${t.low?"low":""}"><td>${t.date}</td><td>${t.floor}층</td><td>${eok(t.price)}</td><td>${((t.price/d.peak-1)*100).toFixed(1)}%</td><td>${t.low?"저층 · 중위값 제외":""}</td></tr>`).join("")}
+      ${d.trades.map(t=>`<tr class="${t.low?"low":""}"><td>${t.date}</td><td>${t.floor}층</td><td>${eok(t.price)}</td><td>${d.peak?((t.price/d.peak-1)*100).toFixed(1)+"%":"–"}</td><td>${t.low?"저층 · 중위값 제외":""}</td></tr>`).join("")}
       </tbody></table></div></div>
   </div>`;
 }
 function chart(d){
   const W_=640,H=220,pl=44,pr=14,pt=14,pb=26,n=MONTHS.length;
   const vals=d.keys.map(k=>d.series[k]);
-  const lo=Math.floor(Math.min(...vals)/10000)*10000, hi=Math.ceil(Math.max(d.peak,...vals)*1.03/10000)*10000;
+  const lo=Math.floor(Math.min(...vals)/10000)*10000, hi=Math.ceil(Math.max(d.peak||0,...vals)*1.03/10000)*10000;
   const step=(hi-lo)>80000?20000:10000;
   const xi=ym=>MONTHS.indexOf(ym);
   const x=i=>pl+(W_-pl-pr)*i/(n-1), y=v=>pt+(H-pt-pb)*(1-(v-lo)/(hi-lo));
@@ -456,8 +457,10 @@ function chart(d){
   const last=P[P.length-1], lastV=vals[vals.length-1];
   return `<svg class="chart" viewBox="0 0 ${W_} ${H}" role="img" aria-label="${d.name} 월별 거래가">
     ${ticks}${xt}
-    <line x1="${pl}" x2="${W_-pr}" y1="${y(d.peak)}" y2="${y(d.peak)}" stroke="var(--bad)" stroke-dasharray="4 4" stroke-width="1"/>
-    <text x="${W_-pr}" y="${y(d.peak)-5}" text-anchor="end" font-size="11" fill="var(--bad)">전고점 ${eokS(d.peak)}</text>
+    ${d.peak?`<line x1="${pl}" x2="${W_-pr}" y1="${y(d.peak)}" y2="${y(d.peak)}" stroke="var(--bad)" stroke-dasharray="4 4" stroke-width="1"/>
+    <text x="${W_-pr}" y="${y(d.peak)-5}" text-anchor="end" font-size="11" fill="var(--bad)">전고점 ${eokS(d.peak)} (${ymLabel(d.peakYm)})</text>`:""}
+    <line x1="${x(MONTHS.indexOf(PEAK_CUTOFF))}" x2="${x(MONTHS.indexOf(PEAK_CUTOFF))}" y1="${pt}" y2="${H-pb}" stroke="var(--muted)" stroke-dasharray="2 3" stroke-width="1"/>
+    <text x="${x(MONTHS.indexOf(PEAK_CUTOFF))-4}" y="${pt+10}" text-anchor="end" font-size="10" fill="var(--muted)">전고점 기준 기간</text>
     <line x1="${pl}" x2="${W_-pr}" y1="${y(d.price)}" y2="${y(d.price)}" stroke="var(--accent)" stroke-dasharray="2 3" stroke-width="1"/>
     <polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-opacity=".7"/>
     ${P.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2" fill="var(--accent)"/>`).join("")}
